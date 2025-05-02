@@ -7,6 +7,7 @@
         Rack StoreRack;
         Oven StoreOven;
         OrderQueue StoreOrders;
+        Inventory StoreInventory;
         int StoreOrderCount;
         int StoreDaysOpen;
         bool StoreOpen;
@@ -19,6 +20,7 @@
             StoreRack = new Rack();
             StoreOven = new Oven(0.2);
             StoreOrders = new OrderQueue();
+            StoreInventory = new Inventory();
             StoreOrderCount = 0;
             StoreDaysOpen = 0;
             StoreOpen = false;
@@ -30,6 +32,39 @@
         private void OnOrderAdded(Order order)
         {
             StoreMoney += 10;
+        }
+
+        private void OnStretch(object sender, PizzaMakerEventArgs e)
+        {
+            if (!StoreInventory.SubtractItemAmount("Dough", 1))
+            {
+                e.PizzaMaker.CancelOrder("Out of dough");
+            }
+        }
+
+        private void OnSauce(object sender, PizzaMakerEventArgs e)
+        {
+            if (!StoreInventory.SubtractItemAmount("Sauce", 1))
+            {
+                e.PizzaMaker.CancelOrder("Out of sauce");
+            }
+        }
+
+        private void OnCheesed(object sender, PizzaMakerEventArgs e)
+        {
+            if (!StoreInventory.SubtractItemAmount("Cheese", 1))
+            {
+                e.PizzaMaker.CancelOrder("Out of cheese");
+            }
+        }
+
+        private void OnTopped(object sender, PizzaMakerEventArgs e)
+        {
+            string itemName = e.PizzaMaker.GetCurrentOrder().GetPizza().GetDescription();
+            if (!StoreInventory.SubtractItemAmount(itemName, 1))
+            {
+                e.PizzaMaker.CancelOrder("out of " + itemName);
+            }
         }
 
         public List<PizzaMaker> GetPizzaMakers()
@@ -70,6 +105,11 @@
         public int GetMoney()
         {
             return StoreMoney;
+        }
+
+        public Inventory GetInventory()
+        {
+            return StoreInventory;
         }
 
         public void OpenStore()
@@ -114,6 +154,10 @@
         public void HirePizzaMaker(string employeeName)
         {
             PizzaMaker pm = new PizzaMaker(employeeName, StoreOrders, StoreOven);
+            pm.OrderStretched += OnStretch;
+            pm.OrderSauced += OnSauce;
+            pm.OrderCheesed += OnCheesed;
+            pm.OrderTopped += OnTopped;
             StorePizzaMakerList.Add(pm);
 
             if (StoreOpen)
@@ -183,6 +227,24 @@
         {
             Order order = new Order(++StoreOrderCount, pizza);
             StoreOrders.Add(order);
+        }
+
+        public bool BuyInventoryItem(string itemName, int amount = 1)
+        {
+            foreach (InventoryItem item in StoreInventory.GetInventoryItems())
+            {
+                if (item.GetName() == itemName)
+                {
+                    if ((item.GetCost() * amount) <= StoreMoney)
+                    {
+                        StoreInventory.AddItemAmount(itemName, amount);
+                        StoreMoney -= item.GetCost() * amount;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

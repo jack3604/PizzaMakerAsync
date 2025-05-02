@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection.Emit;
 using Timer = System.Windows.Forms.Timer;
 
@@ -11,7 +12,8 @@ namespace PizzaMakerAsync
         Store Store;
 
         string[] Names = { "James", "Olivia", "Michael", "Emma", "William", "Ava", "Benjamin", "Sophia", "Daniel", "Mia" };
-        string[] SamplePizzas = { "Cheese", "Pepperoni", "Ham", "Mushroom", "Onion", "Green pepper", "Sausage", "Beef", "Black Olive", "Pineapple", "Chicken" };
+        //string[] SamplePizzas = { "Cheese", "Pepperoni", "Ham", "Mushroom", "Onion", "Green pepper", "Sausage", "Beef", "Black Olive", "Pineapple", "Chicken" };
+        string[] SamplePizzas = { "Cheese", "Pepperoni", "Mushroom" };
         Random random;
 
         public Form1()
@@ -51,10 +53,25 @@ namespace PizzaMakerAsync
             RefreshOvenGridView();
             RefreshOvenTenderGridView();
             RefreshRackGridView();
-            RefreshTotalPizzasCount();
+            RefreshInventoryGridView();
 
+            RefreshTotalPizzasCount();
             RefreshOpenButton();
             RefreshMoneyLabel();
+        }
+
+        public void RefreshInventoryGridView()
+        {
+            InventoryDataGridView.ReadOnly = false;
+            InventoryDataGridView.Rows.Clear();
+
+            foreach (string itemName in Store.GetInventory().GetItemNames())
+            {
+                InventoryDataGridView.Rows.Add(Store.GetInventory().GetItemAmount(itemName), itemName, "Buy");
+            }
+
+            InventoryDataGridView.ReadOnly = true;
+            InventoryDataGridView.Refresh();
         }
 
         public void RefreshOpenButton()
@@ -215,14 +232,21 @@ namespace PizzaMakerAsync
             if (Store.IsOpen())
             {
                 Store.CloseStore();
-                OpenButton.Text = "Open";
-                OpenButton.Refresh();
             }
             else
             {
                 Store.OpenStore();
-                OpenButton.Text = "Close";
-                OpenButton.Refresh();
+            }
+        }
+
+        private void InventoryDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == InventoryBuyColumn.Index)
+            {
+                if (e.RowIndex != -1)
+                {
+                    Store.BuyInventoryItem(InventoryDataGridView[InventoryDescriptionColumn.Index, e.RowIndex].Value.ToString());
+                }
             }
         }
     }

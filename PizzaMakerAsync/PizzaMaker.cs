@@ -11,6 +11,10 @@ namespace PizzaMakerAsync
         OrderQueue Orders;
         public Oven PizzaOven;
         Order? CurrentOrder;
+        public event EventHandler<PizzaMakerEventArgs>? OrderStretched;
+        public event EventHandler<PizzaMakerEventArgs>? OrderSauced;
+        public event EventHandler<PizzaMakerEventArgs>? OrderCheesed;
+        public event EventHandler<PizzaMakerEventArgs>? OrderTopped;
 
 
         public PizzaMaker(string name, OrderQueue orders, Oven pizzaOven) : base(name)
@@ -39,6 +43,21 @@ namespace PizzaMakerAsync
             }
         }
 
+        public void CancelOrder(string reason)
+        {
+            if (CurrentOrder != null)
+            {
+                CurrentOrder = null;
+            }
+
+            SetCurrentTask(reason);
+        }
+
+        public Order GetCurrentOrder()
+        {
+            return CurrentOrder;
+        }
+
         public async Task WaitForOrderAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -64,9 +83,12 @@ namespace PizzaMakerAsync
             await AddSauceAndCheeseAsync(cancellationToken);
             await AddToppingsAsync(cancellationToken);
 
-            if (!cancellationToken.IsCancellationRequested)
+            if (CurrentOrder != null)
             {
-                PizzaOven.Add(CurrentOrder);
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    PizzaOven.Add(CurrentOrder);
+                }
             }
 
             CurrentOrder = null;
@@ -76,8 +98,12 @@ namespace PizzaMakerAsync
         {
             if (!cancellationToken.IsCancellationRequested)
             {
-                SetCurrentTask("Stretching dough");
-                await Task.Delay(2000);
+                if (CurrentOrder != null)
+                {
+                    SetCurrentTask("Stretching dough");
+                    OrderStretched?.Invoke(this, new PizzaMakerEventArgs(this));
+                    await Task.Delay(2000);
+                }
             }
         }
 
@@ -85,8 +111,13 @@ namespace PizzaMakerAsync
         {
             if (!cancellationToken.IsCancellationRequested)
             {
-                SetCurrentTask("Adding sauce");
-                await Task.Delay(1000);
+                if (CurrentOrder != null)
+                {
+                    SetCurrentTask("Adding sauce");
+                    OrderSauced?.Invoke(this, new PizzaMakerEventArgs(this));
+                    OrderCheesed?.Invoke(this, new PizzaMakerEventArgs(this));
+                    await Task.Delay(1000);
+                }
             }
         }
 
@@ -97,6 +128,7 @@ namespace PizzaMakerAsync
                 if (CurrentOrder != null)
                 {
                     SetCurrentTask("Adding " + CurrentOrder.GetPizza().GetDescription());
+                    OrderTopped?.Invoke(this, new PizzaMakerEventArgs(this));
                     await Task.Delay(3000);
                 }
             }
