@@ -5,40 +5,24 @@ namespace PizzaMakerAsync
 {
     public partial class Form1 : Form
     {
-        List<PizzaMaker> PizzaMakerList;
-        List<OvenTender> OvenTenderList;
-        Rack PizzaRack;
-        Oven PizzaOven;
-
         Timer DisplayTimer;
         Timer OrderTimer;
-        OrderQueue PizzaOrders;
-        int OrderCount;
+
+        Store Store;
 
         string[] Names = { "James", "Olivia", "Michael", "Emma", "William", "Ava", "Benjamin", "Sophia", "Daniel", "Mia" };
-        string[] SamplePizzas = { "Cheese", "Pepperoni", "Ham", "Mushroom", "Onion", "Green pepper", "Sausage", "Beef", "Black Olive", "Pineapple", "Chicken"};
+        string[] SamplePizzas = { "Cheese", "Pepperoni", "Ham", "Mushroom", "Onion", "Green pepper", "Sausage", "Beef", "Black Olive", "Pineapple", "Chicken" };
         Random random;
 
         public Form1()
         {
             InitializeComponent();
             random = new Random();
-            PizzaOrders = new OrderQueue();
-            OrderCount = 0;
 
-            PizzaMakerList = new List<PizzaMaker>();
-            OvenTenderList = new List<OvenTender>();
-            PizzaRack = new Rack();
-            PizzaOven = new Oven(0.05);
-            PizzaOven.Start();
-
-            PizzaMaker pm = new PizzaMaker(GetNextName(), PizzaOrders, PizzaOven);
-            pm.Start();
-            PizzaMakerList.Add(pm);
-
-            OvenTender ot = new OvenTender(GetNextName(), PizzaOven, PizzaRack);
-            ot.Start();
-            OvenTenderList.Add(ot);
+            Store = new Store();
+            Store.OpenStore();
+            Store.HirePizzaMaker(GetNextName());
+            Store.HireOvenTender(GetNextName());
 
             DisplayTimer = new Timer();
             DisplayTimer.Interval = 500;
@@ -53,7 +37,11 @@ namespace PizzaMakerAsync
 
         public void OrderTimer_Tick(object? sender, EventArgs e)
         {
-            PizzaOrders.Add(new Order(++OrderCount, new Pizza(GetNextSamplePizza())));
+            Pizza pizza = new Pizza(GetNextSamplePizza());
+            if (Store.IsOpen())
+            {
+                Store.AddOrder(pizza);
+            }
         }
 
         private void DisplayTimer_Tick(object? sender, EventArgs e)
@@ -64,6 +52,29 @@ namespace PizzaMakerAsync
             RefreshOvenTenderGridView();
             RefreshRackGridView();
             RefreshTotalPizzasCount();
+
+            RefreshOpenButton();
+            RefreshMoneyLabel();
+        }
+
+        public void RefreshOpenButton()
+        {
+            if (Store.IsOpen())
+            {
+                OpenButton.Text = "Close";
+                OpenButton.Refresh();
+            }
+            else
+            {
+                OpenButton.Text = "Open";
+                OpenButton.Refresh();
+            }
+        }
+
+        public void RefreshMoneyLabel()
+        {
+            MoneyLabel.Text = "$" + Store.GetMoney().ToString();
+            MoneyLabel.Refresh();
         }
 
         public void RefreshOrderGridView()
@@ -71,7 +82,7 @@ namespace PizzaMakerAsync
             OrderDataGridView.ReadOnly = false;
             OrderDataGridView.Rows.Clear();
 
-            foreach (Order order in PizzaOrders.GetOrders())
+            foreach (Order order in Store.GetOrderQueue().GetOrders())
             {
                 OrderDataGridView.Rows.Add(order.GetId(), order.GetPizza().GetDescription());
             }
@@ -85,6 +96,7 @@ namespace PizzaMakerAsync
             PizzaMakerGridView.ReadOnly = false;
             PizzaMakerGridView.Rows.Clear();
 
+            List<PizzaMaker> PizzaMakerList = Store.GetPizzaMakers();
             for (int i = 0; i < PizzaMakerList.Count; i++)
             {
                 PizzaMakerGridView.Rows.Add(i + 1, PizzaMakerList[i].GetName(), PizzaMakerList[i].GetCurrentTask());
@@ -99,7 +111,7 @@ namespace PizzaMakerAsync
             OvenGridView.ReadOnly = false;
             OvenGridView.Rows.Clear();
 
-            foreach (Order order in PizzaOven.GetOrders())
+            foreach (Order order in Store.GetOven().GetOrders())
             {
                 double bakePercent = order.GetPizza().GetBakeProgress() * 100;
                 string bakePercentString = bakePercent.ToString("F0") + "%";
@@ -115,6 +127,7 @@ namespace PizzaMakerAsync
             OvenTenderGridView.ReadOnly = false;
             OvenTenderGridView.Rows.Clear();
 
+            List<OvenTender> OvenTenderList = Store.GetOvenTenders();
             for (int i = 0; i < OvenTenderList.Count; i++)
             {
                 OvenTenderGridView.Rows.Add(i + 1, OvenTenderList[i].GetName(), OvenTenderList[i].GetCurrentTask());
@@ -129,9 +142,10 @@ namespace PizzaMakerAsync
             RackDataGridView.ReadOnly = false;
             RackDataGridView.Rows.Clear();
 
-            for (int i = PizzaRack.GetOrders().Count - 1; i >= Math.Max(0, PizzaRack.GetOrders().Count - 10); i--)
+            List<Order> orders = Store.GetRack().GetOrders();
+            for (int i = orders.Count - 1; i >= Math.Max(0, orders.Count - 10); i--)
             {
-                Order order = PizzaRack.GetOrders()[i];
+                Order order = orders[i];
                 double bakePercent = order.GetPizza().GetBakeProgress() * 100;
                 string bakePercentString = bakePercent.ToString("F0") + "%";
                 RackDataGridView.Rows.Add(order.GetId(), order.GetPizza().GetDescription(), bakePercentString);
@@ -143,7 +157,7 @@ namespace PizzaMakerAsync
 
         public void RefreshTotalPizzasCount()
         {
-            PizzaCountLabel.Text = PizzaRack.GetOrders().Count.ToString();
+            PizzaCountLabel.Text = Store.GetRack().GetOrders().Count.ToString();
             PizzaCountLabel.Refresh();
         }
 
@@ -161,40 +175,54 @@ namespace PizzaMakerAsync
 
         private void WorkButton_Click(object sender, EventArgs e)
         {
-            PizzaOrders.Add(new Order(++OrderCount, new Pizza(GetNextSamplePizza())));
+            if (MultiCheckbox.Checked)
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    Pizza pizza = new Pizza(GetNextSamplePizza());
+                    Store.AddOrder(pizza);
+                }
+            }
+            else
+            {
+                Pizza pizza = new Pizza(GetNextSamplePizza());
+                Store.AddOrder(pizza);
+            }
         }
 
         private void SpawnPizzaMakerButton_Click(object sender, EventArgs e)
         {
-            PizzaMaker pm = new PizzaMaker(GetNextName(), PizzaOrders, PizzaOven);
-            pm.Start();
-            PizzaMakerList.Add(pm);
+            Store.HirePizzaMaker(GetNextName());
         }
 
         private void SpawnOvenTenderButton_Click(object sender, EventArgs e)
         {
-            OvenTender ot = new OvenTender(GetNextName(), PizzaOven, PizzaRack);
-            ot.Start();
-            OvenTenderList.Add(ot);
+            Store.HireOvenTender(GetNextName());
         }
 
         private void FirePizzaMakerButton_Click(object sender, EventArgs e)
         {
-            if (PizzaMakerList.Count > 0)
-            {
-                PizzaMaker pm = PizzaMakerList[PizzaMakerList.Count - 1];
-                pm.Stop();
-                PizzaMakerList.Remove(pm);
-            }
+            Store.FireLastPizzaMaker();
         }
 
         private void FireOvenTenderButton_Click(object sender, EventArgs e)
         {
-            if (OvenTenderList.Count > 0)
+            Store.FireLastOvenTender();
+        }
+
+        private void OpenButton_Click(object sender, EventArgs e)
+        {
+            if (Store.IsOpen())
             {
-                OvenTender ot = OvenTenderList[OvenTenderList.Count - 1];
-                ot.Stop();
-                OvenTenderList.Remove(ot);
+                Store.CloseStore();
+                OpenButton.Text = "Open";
+                OpenButton.Refresh();
+            }
+            else
+            {
+                Store.OpenStore();
+                OpenButton.Text = "Close";
+                OpenButton.Refresh();
             }
         }
     }

@@ -11,36 +11,41 @@ namespace PizzaMakerAsync
         OrderQueue Orders;
         public Oven PizzaOven;
         Order? CurrentOrder;
-        CancellationTokenSource PizzaMakerCancellationTokenSource;
 
 
-        public PizzaMaker(string name, OrderQueue orders, Oven pizzaOven) : base(name, new CancellationTokenSource())
+        public PizzaMaker(string name, OrderQueue orders, Oven pizzaOven) : base(name)
         {
             Orders = orders;
             PizzaOven = pizzaOven;
             CurrentOrder = null;
-            PizzaMakerCancellationTokenSource = base.GetCancellationTokenSource();
         }
 
         public override void Start()
         {
-            _ = WaitForOrder(PizzaMakerCancellationTokenSource.Token);
+            if (base.GetCancellationTokenSource().Token.IsCancellationRequested)
+            {
+                base.RefreshCancellationTokenSource();
+            }
+
+            _ = WaitForOrderAsync(base.GetCancellationTokenSource().Token);
         }
 
         public override void Stop()
         {
-            PizzaMakerCancellationTokenSource.Cancel();
+            base.GetCancellationTokenSource().Cancel();
             if (CurrentOrder != null)
             {
                 Orders.Add(CurrentOrder);
             }
         }
 
-        public async Task WaitForOrder(CancellationToken cancellationToken)
+        public async Task WaitForOrderAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                if (Orders.GetOrders().Count > 0)
+                SetCurrentTask("Waiting");
+
+                if (Orders.GetOrderCount() > 0)
                 {
                     await MakeNextOrderAsync(cancellationToken);
                 }
@@ -55,37 +60,45 @@ namespace PizzaMakerAsync
 
             Orders.Remove(CurrentOrder);
 
-            await StretchDoughAsync();
-            await AddSauceAndCheeseAsync();
-            await AddToppingsAsync();
+            await StretchDoughAsync(cancellationToken);
+            await AddSauceAndCheeseAsync(cancellationToken);
+            await AddToppingsAsync(cancellationToken);
 
             if (!cancellationToken.IsCancellationRequested)
             {
                 PizzaOven.Add(CurrentOrder);
             }
 
-            SetCurrentTask("Waiting");
             CurrentOrder = null;
         }
 
-        public async Task StretchDoughAsync()
+        public async Task StretchDoughAsync(CancellationToken cancellationToken)
         {
-            SetCurrentTask("Stretching dough");
-            await Task.Delay(2000);
-        }
-
-        public async Task AddSauceAndCheeseAsync()
-        {
-            SetCurrentTask("Adding sauce");
-            await Task.Delay(1000);
-        }
-
-        public async Task AddToppingsAsync()
-        {
-            if (CurrentOrder != null)
+            if (!cancellationToken.IsCancellationRequested)
             {
-                SetCurrentTask("Adding " + CurrentOrder.GetPizza().GetDescription());
-                await Task.Delay(3000);
+                SetCurrentTask("Stretching dough");
+                await Task.Delay(2000);
+            }
+        }
+
+        public async Task AddSauceAndCheeseAsync(CancellationToken cancellationToken)
+        {
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                SetCurrentTask("Adding sauce");
+                await Task.Delay(1000);
+            }
+        }
+
+        public async Task AddToppingsAsync(CancellationToken cancellationToken)
+        {
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                if (CurrentOrder != null)
+                {
+                    SetCurrentTask("Adding " + CurrentOrder.GetPizza().GetDescription());
+                    await Task.Delay(3000);
+                }
             }
         }
     }

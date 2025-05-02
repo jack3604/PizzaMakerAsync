@@ -13,34 +13,39 @@ namespace PizzaMakerAsync
         Oven PizzaOven;
         Rack PizzaRack;
         Order? CurrentOrder;
-        CancellationTokenSource OvenTenderCancellationTokenSource;
 
-        public OvenTender(string name, Oven oven, Rack rack) : base(name, new CancellationTokenSource())
+        public OvenTender(string name, Oven oven, Rack rack) : base(name)
         {
             PizzaOven = oven;
             PizzaRack = rack;
             CurrentOrder = null;
-            OvenTenderCancellationTokenSource = base.GetCancellationTokenSource();
         }
 
         public override void Start()
         {
-            _ = WaitForPizza(OvenTenderCancellationTokenSource.Token);
+            if (base.GetCancellationTokenSource().Token.IsCancellationRequested)
+            {
+                base.RefreshCancellationTokenSource();
+            }
+
+            _ = WaitForPizzaAsync(base.GetCancellationTokenSource().Token);
         }
 
         public override void Stop()
         {
-            OvenTenderCancellationTokenSource.Cancel();
+            base.GetCancellationTokenSource().Cancel();
             if (CurrentOrder != null)
             {
                 PizzaOven.AddNext(CurrentOrder);
             }
         }
 
-        public async Task WaitForPizza(CancellationToken cancellationToken)
+        public async Task WaitForPizzaAsync(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
+                SetCurrentTask("Waiting");
+
                 if (IsPizzaReady())
                 {
                     await CutNextPizzaAsync(cancellationToken);
@@ -96,7 +101,6 @@ namespace PizzaMakerAsync
                 }
             }
             
-            SetCurrentTask("Waiting");
             CurrentOrder = null;
         }
     }

@@ -53,11 +53,18 @@
             OrderDescriptionColumn = new DataGridViewTextBoxColumn();
             FirePizzaMakerButton = new Button();
             FireOvenTenderButton = new Button();
+            InventoryDataGridView = new DataGridView();
+            InventoryQuantityColumn = new DataGridViewTextBoxColumn();
+            InventoryDescriptionColumn = new DataGridViewTextBoxColumn();
+            OpenButton = new Button();
+            MoneyLabel = new Label();
+            MultiCheckbox = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)PizzaMakerGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)OvenGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)RackDataGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)OvenTenderGridView).BeginInit();
             ((System.ComponentModel.ISupportInitialize)OrderDataGridView).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)InventoryDataGridView).BeginInit();
             SuspendLayout();
             // 
             // PizzaMakerGridView
@@ -66,7 +73,7 @@
             PizzaMakerGridView.AllowUserToDeleteRows = false;
             PizzaMakerGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             PizzaMakerGridView.Columns.AddRange(new DataGridViewColumn[] { PizzaMakerPositionColumn, PizzaMakerNameColumn, PizzaMakerTaskColumn });
-            PizzaMakerGridView.Location = new Point(248, 43);
+            PizzaMakerGridView.Location = new Point(148, 43);
             PizzaMakerGridView.Name = "PizzaMakerGridView";
             PizzaMakerGridView.ReadOnly = true;
             PizzaMakerGridView.RowHeadersVisible = false;
@@ -107,7 +114,7 @@
             // 
             PizzaCountLabel.AutoSize = true;
             PizzaCountLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            PizzaCountLabel.Location = new Point(1167, 14);
+            PizzaCountLabel.Location = new Point(1067, 14);
             PizzaCountLabel.Name = "PizzaCountLabel";
             PizzaCountLabel.Size = new Size(19, 21);
             PizzaCountLabel.TabIndex = 2;
@@ -115,7 +122,7 @@
             // 
             // SpawnPizzaMakerButton
             // 
-            SpawnPizzaMakerButton.Location = new Point(248, 14);
+            SpawnPizzaMakerButton.Location = new Point(148, 14);
             SpawnPizzaMakerButton.Name = "SpawnPizzaMakerButton";
             SpawnPizzaMakerButton.Size = new Size(116, 23);
             SpawnPizzaMakerButton.TabIndex = 3;
@@ -131,7 +138,7 @@
             OvenGridView.AllowUserToResizeRows = false;
             OvenGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             OvenGridView.Columns.AddRange(new DataGridViewColumn[] { OvenPositionColumn, OvenDescriptionColumn, OvenBakeColumn });
-            OvenGridView.Location = new Point(484, 43);
+            OvenGridView.Location = new Point(384, 43);
             OvenGridView.Name = "OvenGridView";
             OvenGridView.ReadOnly = true;
             OvenGridView.RowHeadersVisible = false;
@@ -144,7 +151,7 @@
             OvenPositionColumn.HeaderText = "#";
             OvenPositionColumn.Name = "OvenPositionColumn";
             OvenPositionColumn.ReadOnly = true;
-            OvenPositionColumn.Width = 25;
+            OvenPositionColumn.Width = 30;
             // 
             // OvenDescriptionColumn
             // 
@@ -166,7 +173,7 @@
             RackDataGridView.AllowUserToResizeRows = false;
             RackDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             RackDataGridView.Columns.AddRange(new DataGridViewColumn[] { RackPositionColumn, RackDescriptionColumn, RackBakeColumn });
-            RackDataGridView.Location = new Point(956, 43);
+            RackDataGridView.Location = new Point(856, 43);
             RackDataGridView.Name = "RackDataGridView";
             RackDataGridView.ReadOnly = true;
             RackDataGridView.RowHeadersVisible = false;
@@ -179,7 +186,7 @@
             RackPositionColumn.HeaderText = "#";
             RackPositionColumn.Name = "RackPositionColumn";
             RackPositionColumn.ReadOnly = true;
-            RackPositionColumn.Width = 25;
+            RackPositionColumn.Width = 35;
             // 
             // RackDescriptionColumn
             // 
@@ -201,7 +208,7 @@
             OvenTenderGridView.AllowUserToResizeRows = false;
             OvenTenderGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             OvenTenderGridView.Columns.AddRange(new DataGridViewColumn[] { OvenTenderPositionColumn, OvenTenderNameColumn, OvenTenderTaskColumn });
-            OvenTenderGridView.Location = new Point(720, 43);
+            OvenTenderGridView.Location = new Point(620, 43);
             OvenTenderGridView.Name = "OvenTenderGridView";
             OvenTenderGridView.ReadOnly = true;
             OvenTenderGridView.RowHeadersVisible = false;
@@ -214,7 +221,7 @@
             OvenTenderPositionColumn.HeaderText = "#";
             OvenTenderPositionColumn.Name = "OvenTenderPositionColumn";
             OvenTenderPositionColumn.ReadOnly = true;
-            OvenTenderPositionColumn.Width = 25;
+            OvenTenderPositionColumn.Width = 35;
             // 
             // OvenTenderNameColumn
             // 
@@ -230,7 +237,7 @@
             // 
             // SpawnOvenTenderButton
             // 
-            SpawnOvenTenderButton.Location = new Point(720, 12);
+            SpawnOvenTenderButton.Location = new Point(620, 12);
             SpawnOvenTenderButton.Name = "SpawnOvenTenderButton";
             SpawnOvenTenderButton.Size = new Size(123, 23);
             SpawnOvenTenderButton.TabIndex = 7;
@@ -251,7 +258,7 @@
             OrderDataGridView.ReadOnly = true;
             OrderDataGridView.RowHeadersVisible = false;
             OrderDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            OrderDataGridView.Size = new Size(230, 600);
+            OrderDataGridView.Size = new Size(130, 600);
             OrderDataGridView.TabIndex = 8;
             // 
             // OrderPositionColumn
@@ -259,7 +266,7 @@
             OrderPositionColumn.HeaderText = "#";
             OrderPositionColumn.Name = "OrderPositionColumn";
             OrderPositionColumn.ReadOnly = true;
-            OrderPositionColumn.Width = 25;
+            OrderPositionColumn.Width = 35;
             // 
             // OrderDescriptionColumn
             // 
@@ -269,7 +276,7 @@
             // 
             // FirePizzaMakerButton
             // 
-            FirePizzaMakerButton.Location = new Point(370, 14);
+            FirePizzaMakerButton.Location = new Point(270, 14);
             FirePizzaMakerButton.Name = "FirePizzaMakerButton";
             FirePizzaMakerButton.Size = new Size(75, 23);
             FirePizzaMakerButton.TabIndex = 9;
@@ -279,7 +286,7 @@
             // 
             // FireOvenTenderButton
             // 
-            FireOvenTenderButton.Location = new Point(849, 12);
+            FireOvenTenderButton.Location = new Point(749, 12);
             FireOvenTenderButton.Name = "FireOvenTenderButton";
             FireOvenTenderButton.Size = new Size(75, 23);
             FireOvenTenderButton.TabIndex = 10;
@@ -287,12 +294,75 @@
             FireOvenTenderButton.UseVisualStyleBackColor = true;
             FireOvenTenderButton.Click += FireOvenTenderButton_Click;
             // 
+            // InventoryDataGridView
+            // 
+            InventoryDataGridView.AllowUserToAddRows = false;
+            InventoryDataGridView.AllowUserToDeleteRows = false;
+            InventoryDataGridView.AllowUserToResizeColumns = false;
+            InventoryDataGridView.AllowUserToResizeRows = false;
+            InventoryDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            InventoryDataGridView.Columns.AddRange(new DataGridViewColumn[] { InventoryQuantityColumn, InventoryDescriptionColumn });
+            InventoryDataGridView.Location = new Point(856, 343);
+            InventoryDataGridView.Name = "InventoryDataGridView";
+            InventoryDataGridView.ReadOnly = true;
+            InventoryDataGridView.RowHeadersVisible = false;
+            InventoryDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            InventoryDataGridView.Size = new Size(230, 300);
+            InventoryDataGridView.TabIndex = 11;
+            // 
+            // InventoryQuantityColumn
+            // 
+            InventoryQuantityColumn.HeaderText = "#";
+            InventoryQuantityColumn.Name = "InventoryQuantityColumn";
+            InventoryQuantityColumn.ReadOnly = true;
+            InventoryQuantityColumn.Width = 50;
+            // 
+            // InventoryDescriptionColumn
+            // 
+            InventoryDescriptionColumn.HeaderText = "Topping";
+            InventoryDescriptionColumn.Name = "InventoryDescriptionColumn";
+            InventoryDescriptionColumn.ReadOnly = true;
+            // 
+            // OpenButton
+            // 
+            OpenButton.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            OpenButton.Location = new Point(12, 649);
+            OpenButton.Name = "OpenButton";
+            OpenButton.Size = new Size(142, 49);
+            OpenButton.TabIndex = 12;
+            OpenButton.Text = "Open";
+            OpenButton.UseVisualStyleBackColor = true;
+            OpenButton.Click += OpenButton_Click;
+            // 
+            // MoneyLabel
+            // 
+            MoneyLabel.AutoSize = true;
+            MoneyLabel.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            MoneyLabel.Location = new Point(160, 677);
+            MoneyLabel.Name = "MoneyLabel";
+            MoneyLabel.Size = new Size(28, 21);
+            MoneyLabel.TabIndex = 13;
+            MoneyLabel.Text = "$0";
+            // 
+            // MultiCheckbox
+            // 
+            MultiCheckbox.AutoSize = true;
+            MultiCheckbox.Location = new Point(108, 17);
+            MultiCheckbox.Name = "MultiCheckbox";
+            MultiCheckbox.Size = new Size(15, 14);
+            MultiCheckbox.TabIndex = 14;
+            MultiCheckbox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImageLayout = ImageLayout.None;
             ClientSize = new Size(1240, 838);
+            Controls.Add(MultiCheckbox);
+            Controls.Add(MoneyLabel);
+            Controls.Add(OpenButton);
+            Controls.Add(InventoryDataGridView);
             Controls.Add(FireOvenTenderButton);
             Controls.Add(FirePizzaMakerButton);
             Controls.Add(OrderDataGridView);
@@ -311,6 +381,7 @@
             ((System.ComponentModel.ISupportInitialize)RackDataGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)OvenTenderGridView).EndInit();
             ((System.ComponentModel.ISupportInitialize)OrderDataGridView).EndInit();
+            ((System.ComponentModel.ISupportInitialize)InventoryDataGridView).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -328,6 +399,9 @@
         private DataGridViewTextBoxColumn PizzaMakerPositionColumn;
         private DataGridViewTextBoxColumn PizzaMakerNameColumn;
         private DataGridViewTextBoxColumn PizzaMakerTaskColumn;
+        private DataGridView OrderDataGridView;
+        private Button FirePizzaMakerButton;
+        private Button FireOvenTenderButton;
         private DataGridViewTextBoxColumn OvenPositionColumn;
         private DataGridViewTextBoxColumn OvenDescriptionColumn;
         private DataGridViewTextBoxColumn OvenBakeColumn;
@@ -337,10 +411,13 @@
         private DataGridViewTextBoxColumn OvenTenderPositionColumn;
         private DataGridViewTextBoxColumn OvenTenderNameColumn;
         private DataGridViewTextBoxColumn OvenTenderTaskColumn;
-        private DataGridView OrderDataGridView;
         private DataGridViewTextBoxColumn OrderPositionColumn;
         private DataGridViewTextBoxColumn OrderDescriptionColumn;
-        private Button FirePizzaMakerButton;
-        private Button FireOvenTenderButton;
+        private DataGridView InventoryDataGridView;
+        private DataGridViewTextBoxColumn InventoryQuantityColumn;
+        private DataGridViewTextBoxColumn InventoryDescriptionColumn;
+        private Button OpenButton;
+        private Label MoneyLabel;
+        private CheckBox MultiCheckbox;
     }
 }

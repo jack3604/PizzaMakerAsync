@@ -26,6 +26,14 @@ namespace PizzaMakerAsync
             }
         }
 
+        public int GetOrderCount()
+        {
+            lock (lockObj)
+            {
+                return Orders.Count;
+            }
+        }
+
         public void Add(Order order)
         {
             lock (lockObj)
@@ -39,6 +47,14 @@ namespace PizzaMakerAsync
             lock (lockObj)
             {
                 Orders.Remove(order);
+            }
+        }
+
+        public void Clear()
+        {
+            lock (lockObj)
+            {
+                Orders.Clear();
             }
         }
     }

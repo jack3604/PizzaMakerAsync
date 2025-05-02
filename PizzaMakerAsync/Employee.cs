@@ -12,16 +12,21 @@ namespace PizzaMakerAsync
         string CurrentTask;
         CancellationTokenSource CancellationTokenSource;
 
-        public Employee(string name, CancellationTokenSource cancellationTokenSource)
+        public Employee(string name)
         {
             Name = name;
             CurrentTask = "Waiting";
-            CancellationTokenSource = cancellationTokenSource;
+            CancellationTokenSource = new CancellationTokenSource();
         }
 
         public CancellationTokenSource GetCancellationTokenSource()
         {
             return CancellationTokenSource;
+        }
+
+        public CancellationTokenSource RefreshCancellationTokenSource()
+        {
+            return CancellationTokenSource = new CancellationTokenSource();
         }
 
         public abstract void Start();

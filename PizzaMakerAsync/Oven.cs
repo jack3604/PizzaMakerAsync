@@ -23,12 +23,21 @@ namespace PizzaMakerAsync
 
         public void Start()
         {
+            if (OvenCancellationTokenSource.Token.IsCancellationRequested)
+            {
+                OvenCancellationTokenSource = new CancellationTokenSource();
+            }
+
             _ = AdvanceBeltAsync(OvenCancellationTokenSource.Token);
         }
 
         public void Stop()
         {
             OvenCancellationTokenSource.Cancel();
+            lock (lockObj)
+            {
+                Belt = new List<Order>();
+            }
         }
 
         public async Task AdvanceBeltAsync(CancellationToken cancellationToken)

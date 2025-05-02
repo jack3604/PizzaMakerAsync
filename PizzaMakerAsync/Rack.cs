@@ -9,20 +9,24 @@ namespace PizzaMakerAsync
     internal class Rack
     {
         public List<Order> PizzaRack;
+        public event Action<Order>? OrderAdded;
 
         public Rack()
         {
             PizzaRack = new List<Order>();
         }
 
-        public void Add(Order o)
+
+        public void Add(Order order)
         {
-            PizzaRack.Add(o);
+            PizzaRack.Add(order);
+
+            OrderAdded?.Invoke(order);
         }
 
-        public void Remove(Order o) 
+        public void Remove(Order order) 
         {
-            PizzaRack.Remove(o);
+            PizzaRack.Remove(order);
         }
 
         public void Clear() 
